@@ -45,9 +45,14 @@ public class Product implements Validated {
 		if(name.isEmpty()) throw new InvalidName();
 	}
 	
-	public void addStock(Long stock) throws InvalidStock {
-		if(stock < 0) throw new InvalidStock(stock);
-		this.stock += stock;
+	public void addStock(Long quantity) throws InvalidStock {
+		if(quantity < 0) throw new InvalidStock(quantity);
+		this.stock += quantity;
+	}
+	
+	public void removeStock(Long quantity) throws InvalidStock {
+		if(this.stock < quantity) throw new InvalidStock(quantity);
+		this.stock -= quantity;
 	}
 
 	public Long getId() {

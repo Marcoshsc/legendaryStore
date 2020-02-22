@@ -1,5 +1,6 @@
 package com.marcoshsc.domain;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -7,6 +8,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.PostPersist;
 
 import com.marcoshsc.exceptions.InvalidQuantity;
 import com.marcoshsc.exceptions.NullField;
@@ -23,7 +25,7 @@ public class SaleItem implements Validated {
 	@JoinColumn(name = "sale_id")
 	private Sale sale;
 
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.DETACH)
 	@JoinColumn(name = "product_id")
 	private Product product;
 
@@ -36,9 +38,8 @@ public class SaleItem implements Validated {
 		super();
 	}
 
-	public SaleItem(Sale sale, Product product, Long quantity) throws NullField, InvalidQuantity {
+	public SaleItem(Product product, Long quantity) throws NullField, InvalidQuantity {
 		super();
-		this.sale = sale;
 		this.product = product;
 		this.quantity = quantity;
 		checkIrregularities();
@@ -48,7 +49,6 @@ public class SaleItem implements Validated {
 	@Override
 	public void checkIrregularities() throws NullField, InvalidQuantity {
 		if(product == null) throw new NullField("saleItem(product)");
-		if(sale == null) throw new NullField("saleItem(sale)");
 		if(quantity == null) throw new NullField("saleItem(quantity)");
 		if(quantity < 0) throw new InvalidQuantity(quantity);
 	}

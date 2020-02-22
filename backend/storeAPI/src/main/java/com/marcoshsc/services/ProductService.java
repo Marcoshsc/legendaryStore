@@ -1,5 +1,6 @@
 package com.marcoshsc.services;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,10 @@ public class ProductService {
 		return productRepo.save(product);
 	}
 	
+	public List<Product> getAllProducts() {
+		return productRepo.findAll();
+	}
+	
 	public Product remove(Long id) throws NoSuchElementException {
 		Product toBeFound = productRepo.findById(id).get();
 		productRepo.delete(toBeFound);
@@ -42,6 +47,10 @@ public class ProductService {
 	public void addStock(Long id, Long stock) throws InvalidStock, NoSuchElementException {
 		Product entity = productRepo.findById(id).get();
 		entity.addStock(stock);
+	}
+	
+	public Product find(Long id) throws NoSuchElementException {
+		return productRepo.findById(id).get();
 	}
 	
 }

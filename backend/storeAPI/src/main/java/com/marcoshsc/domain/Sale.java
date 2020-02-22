@@ -1,10 +1,13 @@
 package com.marcoshsc.domain;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -12,6 +15,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import com.marcoshsc.exceptions.InvalidSale;
+import com.marcoshsc.exceptions.InvalidStock;
 import com.marcoshsc.exceptions.NullField;
 import com.marcoshsc.interfaces.Validated;
 
@@ -29,8 +34,8 @@ public class Sale implements Validated {
 	@Column(name = "sale_date")
 	private LocalDate date;
 	
-	@OneToMany(mappedBy = "sale")
-	private List<SaleItem> saleItems;
+	@OneToMany(mappedBy = "sale", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+	private List<SaleItem> saleItems = new ArrayList<SaleItem>();
 	
 	public Sale() {
 		super();
@@ -47,6 +52,22 @@ public class Sale implements Validated {
 	public void checkIrregularities() throws NullField {
 		if(client == null) throw new NullField("sale(client)");
 		if(date == null) throw new NullField("sale(date)");
+	}
+	
+	public static Sale makeSale(Client client, List<SaleItem> saleItems) throws InvalidSale, NullField {
+		InvalidSale exc = new InvalidSale();
+		Sale sale = new Sale(client);
+		for(SaleItem si: saleItems) {
+			Product saleItemProduct = si.getProduct();
+			if(saleItemProduct.getStock() < si.getQuantity())
+				exc.getProducts().add(saleItemProduct);
+			si.setSale(sale);
+		}
+		if(exc.getProducts().size() != 0)
+			throw exc;
+		
+		sale.setSaleItems(saleItems);
+		return sale;
 	}
 
 	public Long getId() {
@@ -71,6 +92,14 @@ public class Sale implements Validated {
 
 	public void setDate(LocalDate date) {
 		this.date = date;
+	}
+
+	public List<SaleItem> getSaleItems() {
+		return saleItems;
+	}
+
+	public void setSaleItems(List<SaleItem> saleItems) {
+		this.saleItems = saleItems;
 	}
 	
 }
