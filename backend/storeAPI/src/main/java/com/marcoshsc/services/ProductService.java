@@ -11,13 +11,18 @@ import com.marcoshsc.exceptions.InvalidName;
 import com.marcoshsc.exceptions.InvalidPrice;
 import com.marcoshsc.exceptions.InvalidStock;
 import com.marcoshsc.exceptions.NullField;
+import com.marcoshsc.exceptions.VinculatedClass;
 import com.marcoshsc.repos.ProductRepository;
+import com.marcoshsc.repos.SaleItemRepository;
 
 @Service
 public class ProductService {
 	
 	@Autowired
 	private ProductRepository productRepo;
+	
+	@Autowired
+	private SaleItemRepository saleItemRepo;
 	
 	public Product add(Product product) throws InvalidStock, InvalidName, InvalidPrice, NullField {
 		product.checkIrregularities();
@@ -44,7 +49,7 @@ public class ProductService {
 		return productRepo.save(toBeUpdated);
 	}
 	
-	public void addStock(Long id, Long stock) throws InvalidStock, NoSuchElementException {
+	public void addStock(Long id, Long stock) throws InvalidStock, NoSuchElementException, VinculatedClass {
 		Product entity = productRepo.findById(id).get();
 		entity.addStock(stock);
 	}
