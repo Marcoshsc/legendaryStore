@@ -8,8 +8,10 @@ import org.springframework.stereotype.Repository;
 
 import com.marcoshsc.domain.Client;
 import com.marcoshsc.domain.Product;
+import com.marcoshsc.domain.Sale;
 import com.marcoshsc.exceptions.InvalidName;
 import com.marcoshsc.exceptions.NullField;
+import com.marcoshsc.exceptions.VinculatedClass;
 import com.marcoshsc.repos.ClientRepository;
 import com.marcoshsc.repos.SaleRepository;
 
@@ -27,7 +29,11 @@ public class ClientService {
 		return clientRepo.save(client);
 	}
 	
-	public Client remove(Long id) throws NoSuchElementException {
+	public Client remove(Long id) throws NoSuchElementException, VinculatedClass {
+		try {
+			salesRepo.findById(id).get();
+			throw new VinculatedClass();
+		} catch(NoSuchElementException exc) {}
 		Client entity = clientRepo.findById(id).get();
 		clientRepo.delete(entity);
 		return entity;
