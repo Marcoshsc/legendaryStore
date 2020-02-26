@@ -18,6 +18,7 @@ import com.marcoshsc.dao.FinalResponse;
 import com.marcoshsc.domain.Client;
 import com.marcoshsc.exceptions.InvalidName;
 import com.marcoshsc.exceptions.NullField;
+import com.marcoshsc.exceptions.VinculatedClass;
 import com.marcoshsc.services.ClientService;
 
 @RestController
@@ -85,6 +86,9 @@ public class ClientController {
 			return new FinalResponse<Object>("200", dbClient);
 		} catch(NoSuchElementException exc) {
 			ErrorDAO error = new ErrorDAO("Invalid ID, client not found");
+			return new FinalResponse<ErrorDAO>("400", error);
+		} catch(VinculatedClass exc) {
+			ErrorDAO error = new ErrorDAO(exc.getMessage());
 			return new FinalResponse<ErrorDAO>("400", error);
 		} catch(Exception exc) {
 			ErrorDAO error = new ErrorDAO("Unexpected error.");

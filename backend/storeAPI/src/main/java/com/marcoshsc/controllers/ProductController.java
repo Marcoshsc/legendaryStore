@@ -20,6 +20,7 @@ import com.marcoshsc.exceptions.InvalidName;
 import com.marcoshsc.exceptions.InvalidPrice;
 import com.marcoshsc.exceptions.InvalidStock;
 import com.marcoshsc.exceptions.NullField;
+import com.marcoshsc.exceptions.VinculatedClass;
 import com.marcoshsc.services.ProductService;
 
 @RestController
@@ -87,6 +88,9 @@ public class ProductController {
 			return new FinalResponse<Product>("200", p);
 		} catch(NoSuchElementException exc) {
 			ErrorDAO error = new ErrorDAO("Invalid ID, product not found.");
+			return new FinalResponse<ErrorDAO>("400", error);
+		} catch(VinculatedClass exc) {
+			ErrorDAO error = new ErrorDAO(exc.getMessage());
 			return new FinalResponse<ErrorDAO>("400", error);
 		} catch(Exception exc) {
 			ErrorDAO error = new ErrorDAO("Unexpected error.");

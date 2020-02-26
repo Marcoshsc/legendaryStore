@@ -1,5 +1,6 @@
 package com.marcoshsc.services;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +60,14 @@ public class SaleService {
 		dbSale.setDate(sale.getDate());
 		dbSale.setSaleItems(sale.getSaleItems());
 		return salesRepo.save(dbSale);
+	}
+	
+	public List<Sale> getAll() {
+		return salesRepo.findAll();
+	}
+	
+	public Sale getById(Long id) throws NoSuchElementException {
+		return salesRepo.findById(id).get();
 	}
 	
 }

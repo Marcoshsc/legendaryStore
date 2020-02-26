@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.marcoshsc.domain.Product;
+import com.marcoshsc.domain.SaleItem;
 import com.marcoshsc.exceptions.InvalidName;
 import com.marcoshsc.exceptions.InvalidPrice;
 import com.marcoshsc.exceptions.InvalidStock;
@@ -33,7 +34,11 @@ public class ProductService {
 		return productRepo.findAll();
 	}
 	
-	public Product remove(Long id) throws NoSuchElementException {
+	public Product remove(Long id) throws NoSuchElementException, VinculatedClass {
+		List<SaleItem> associatedItems = saleItemRepo.findByProductId(id);
+		int size = associatedItems.size();
+		if(size != 0)
+			throw new VinculatedClass(size);
 		Product toBeFound = productRepo.findById(id).get();
 		productRepo.delete(toBeFound);
 		return toBeFound;

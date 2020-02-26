@@ -10,6 +10,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.PostPersist;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.marcoshsc.exceptions.InvalidQuantity;
 import com.marcoshsc.exceptions.NullField;
 import com.marcoshsc.interfaces.Validated;
@@ -23,6 +24,7 @@ public class SaleItem implements Validated {
 
 	@ManyToOne
 	@JoinColumn(name = "sale_id")
+	@JsonIgnore
 	private Sale sale;
 
 	@ManyToOne(cascade = CascadeType.DETACH)

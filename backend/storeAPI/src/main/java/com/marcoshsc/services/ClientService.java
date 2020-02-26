@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.marcoshsc.domain.Client;
-import com.marcoshsc.domain.Product;
 import com.marcoshsc.domain.Sale;
 import com.marcoshsc.exceptions.InvalidName;
 import com.marcoshsc.exceptions.NullField;
@@ -30,10 +29,9 @@ public class ClientService {
 	}
 	
 	public Client remove(Long id) throws NoSuchElementException, VinculatedClass {
-		try {
-			salesRepo.findById(id).get();
-			throw new VinculatedClass();
-		} catch(NoSuchElementException exc) {}
+		List<Sale> associatedSales = salesRepo.findByClientId(id);
+		if(associatedSales.size() != 0)
+			throw new VinculatedClass(associatedSales.size());
 		Client entity = clientRepo.findById(id).get();
 		clientRepo.delete(entity);
 		return entity;

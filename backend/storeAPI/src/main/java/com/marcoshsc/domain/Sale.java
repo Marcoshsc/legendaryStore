@@ -58,6 +58,7 @@ public class Sale implements Validated {
 		InvalidSale exc = new InvalidSale();
 		Sale sale = new Sale(client);
 		for(SaleItem si: saleItems) {
+			si.setFinalPrice(si.getProduct().getPrice() * si.getQuantity());
 			Product saleItemProduct = si.getProduct();
 			if(saleItemProduct.getStock() < si.getQuantity())
 				exc.getProducts().add(saleItemProduct);
