@@ -1,7 +1,10 @@
 package com.marcoshsc.services;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -58,7 +61,14 @@ public class SaleService {
 		Sale dbSale = salesRepo.findById(id).get();
 		dbSale.setClient(sale.getClient());
 		dbSale.setDate(sale.getDate());
-		dbSale.setSaleItems(sale.getSaleItems());
+		for(SaleItem si: sale.getSaleItems()) {
+			si.setSale(dbSale);
+		}
+		Set<SaleItem> paramSaleItemsSet = new HashSet<SaleItem>(sale.getSaleItems());
+		Set<SaleItem> dbSaleItemsSet = new HashSet<SaleItem>(dbSale.getSaleItems());
+		dbSaleItemsSet.addAll(paramSaleItemsSet);
+		dbSale.getSaleItems().clear();
+		dbSale.getSaleItems().addAll(dbSaleItemsSet);
 		return salesRepo.save(dbSale);
 	}
 	

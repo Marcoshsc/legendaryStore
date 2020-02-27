@@ -5,10 +5,13 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.marcoshsc.exceptions.InvalidName;
 import com.marcoshsc.exceptions.NullField;
 import com.marcoshsc.interfaces.Validated;
+import com.marcoshsc.views.ProductView;
 
+@JsonView(ProductView.SaleItemView.class)
 @Entity(name = "clients")
 public class Client implements Validated {
 	

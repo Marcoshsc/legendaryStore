@@ -11,9 +11,11 @@ import javax.persistence.ManyToOne;
 import javax.persistence.PostPersist;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.marcoshsc.exceptions.InvalidQuantity;
 import com.marcoshsc.exceptions.NullField;
 import com.marcoshsc.interfaces.Validated;
+import com.marcoshsc.views.ProductView;
 
 @Entity(name = "sale_items")
 public class SaleItem implements Validated {
@@ -27,12 +29,15 @@ public class SaleItem implements Validated {
 	@JsonIgnore
 	private Sale sale;
 
+	@JsonView(ProductView.SaleItemView.class)
 	@ManyToOne(cascade = CascadeType.DETACH)
 	@JoinColumn(name = "product_id")
 	private Product product;
 
+	@JsonView(ProductView.SaleItemView.class)
 	private Long quantity;
 
+	@JsonView(ProductView.SaleItemView.class)
 	@Column(name = "final_price")
 	private Double finalPrice;
 
@@ -53,6 +58,37 @@ public class SaleItem implements Validated {
 		if(product == null) throw new NullField("saleItem(product)");
 		if(quantity == null) throw new NullField("saleItem(quantity)");
 		if(quantity < 0) throw new InvalidQuantity(quantity);
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((product == null) ? 0 : product.hashCode());
+		result = prime * result + ((quantity == null) ? 0 : quantity.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		SaleItem other = (SaleItem) obj;
+		if (product == null) {
+			if (other.product != null)
+				return false;
+		} else if (!product.equals(other.product))
+			return false;
+		if (quantity == null) {
+			if (other.quantity != null)
+				return false;
+		} else if (!quantity.equals(other.quantity))
+			return false;
+		return true;
 	}
 
 	public Long getId() {

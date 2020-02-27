@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import com.marcoshsc.dao.ErrorDAO;
 import com.marcoshsc.dao.FinalResponse;
 import com.marcoshsc.dao.SaleDTO;
@@ -22,11 +23,13 @@ import com.marcoshsc.domain.Client;
 import com.marcoshsc.domain.Product;
 import com.marcoshsc.domain.Sale;
 import com.marcoshsc.domain.SaleItem;
+import com.marcoshsc.exceptions.InvalidQuantity;
 import com.marcoshsc.exceptions.InvalidSale;
 import com.marcoshsc.exceptions.NullField;
 import com.marcoshsc.services.ClientService;
 import com.marcoshsc.services.ProductService;
 import com.marcoshsc.services.SaleService;
+import com.marcoshsc.views.ProductView;
 
 @RestController
 @RequestMapping("/sales")
@@ -40,12 +43,14 @@ public class SaleController {
 	
 	@Autowired ProductService productService;
 	
+	@JsonView(ProductView.SaleItemView.class)
 	@GetMapping
 	public FinalResponse<? extends Object> getAllSales() {
 		List<Sale> dbSales = saleService.getAll();
 		return new FinalResponse<Sale>("200", dbSales);
 	}
 	
+	@JsonView(ProductView.SaleItemView.class)
 	@GetMapping("/{id}")
 	public FinalResponse<? extends Object> getSaleById(@PathVariable("id") Long id) {
 		try {
@@ -60,6 +65,7 @@ public class SaleController {
 		}
 	}
 	
+	@JsonView(ProductView.SaleItemView.class)
 	@PostMapping
 	public FinalResponse<? extends Object> addSale(@RequestBody SaleDTO data) {
 		try {
@@ -84,25 +90,32 @@ public class SaleController {
 		}
 	}
 	
+	@JsonView(ProductView.SaleItemView.class)
 	@PutMapping("/{id}")
 	public FinalResponse<? extends Object> updateSale(@PathVariable("id") Long id, @RequestBody SaleDTO data) {
 		try {
 			Client requestClient = clientService.find(data.getClientId());
-			//Sale preSale = Sale.makeSale(requestClient, data.getSaleItems());
-			//Sale dbSale = saleService.update(id, preSale);
-			return new FinalResponse<Sale>("200", new Sale()/*dbSale*/);
-		} //catch (InvalidSale | NullField exc) {
-//			ErrorDAO error = new ErrorDAO(exc.getMessage());
-//			return new FinalResponse<ErrorDAO>("400", error);
-		/*}*/ catch(NoSuchElementException exc) {
+			List<SaleItem> saleItems = new ArrayList<>();
+			for(SaleItemDTO sidto: data.getSaleItems()) {
+				Product p = productService.find(sidto.getProductId());
+				saleItems.add(new SaleItem(p, sidto.getQuantity()));
+			}
+			Sale preSale = Sale.makeSale(requestClient, saleItems);
+			Sale dbSale = saleService.update(id, preSale);
+			return new FinalResponse<Sale>("200", dbSale);
+		} catch (InvalidSale | NullField | InvalidQuantity exc) {
+			ErrorDAO error = new ErrorDAO(exc.getMessage());
+			return new FinalResponse<ErrorDAO>("400", error);
+		} catch(NoSuchElementException exc) {
 			ErrorDAO error = new ErrorDAO("Invalid ID. Client/Sale not found. Can't update the sale.");
-			return new FinalResponse<ErrorDAO>("400", error);
-		} catch(Exception exc) {
-			ErrorDAO error = new ErrorDAO("Unexpected Error.");
-			return new FinalResponse<ErrorDAO>("400", error);
-		}
+			return new FinalResponse<ErrorDAO>("400", error);}
+//		} catch(Exception exc) {
+//			ErrorDAO error = new ErrorDAO("Unexpected error.");
+//			return new FinalResponse<ErrorDAO>("400", error);
+//		}
 	}
 	
+	@JsonView(ProductView.SaleItemView.class)
 	@DeleteMapping("/{id}")
 	public FinalResponse<? extends Object> deleteSale(@PathVariable("id") Long id) {
 		try {

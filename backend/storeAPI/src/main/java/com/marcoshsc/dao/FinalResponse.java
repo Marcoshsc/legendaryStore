@@ -3,6 +3,10 @@ package com.marcoshsc.dao;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import com.marcoshsc.views.ProductView;
+
+@JsonView(ProductView.SaleItemView.class)
 public class FinalResponse<T extends Object> {
 	
 	private String status;

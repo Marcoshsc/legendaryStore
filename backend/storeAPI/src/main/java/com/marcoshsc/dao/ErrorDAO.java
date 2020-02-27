@@ -1,5 +1,9 @@
 package com.marcoshsc.dao;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import com.marcoshsc.views.ProductView;
+
+@JsonView(ProductView.SaleItemView.class)
 public class ErrorDAO {
 	
 	private final String message = "An error has occurred";

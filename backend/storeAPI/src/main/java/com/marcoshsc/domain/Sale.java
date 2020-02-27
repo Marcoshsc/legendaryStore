@@ -15,11 +15,16 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.marcoshsc.exceptions.InvalidSale;
 import com.marcoshsc.exceptions.InvalidStock;
 import com.marcoshsc.exceptions.NullField;
 import com.marcoshsc.interfaces.Validated;
+import com.marcoshsc.views.ProductView;
 
+@JsonView(ProductView.SaleItemView.class)
 @Entity(name = "sales")
 public class Sale implements Validated {
 	
