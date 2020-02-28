@@ -30,7 +30,7 @@ public class SaleItem implements Validated {
 	private Sale sale;
 
 	@JsonView(ProductView.SaleItemView.class)
-	@ManyToOne(cascade = CascadeType.DETACH)
+	@ManyToOne
 	@JoinColumn(name = "product_id")
 	private Product product;
 
@@ -65,7 +65,6 @@ public class SaleItem implements Validated {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((product == null) ? 0 : product.hashCode());
-		result = prime * result + ((quantity == null) ? 0 : quantity.hashCode());
 		return result;
 	}
 
@@ -82,11 +81,6 @@ public class SaleItem implements Validated {
 			if (other.product != null)
 				return false;
 		} else if (!product.equals(other.product))
-			return false;
-		if (quantity == null) {
-			if (other.quantity != null)
-				return false;
-		} else if (!quantity.equals(other.quantity))
 			return false;
 		return true;
 	}
@@ -121,6 +115,8 @@ public class SaleItem implements Validated {
 
 	public void setQuantity(Long quantity) {
 		this.quantity = quantity;
+		if(product != null)
+			setFinalPrice(this.quantity * product.getPrice());
 	}
 
 	public Double getFinalPrice() {

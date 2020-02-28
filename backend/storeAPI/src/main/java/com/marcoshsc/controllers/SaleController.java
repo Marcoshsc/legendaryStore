@@ -25,6 +25,7 @@ import com.marcoshsc.domain.Sale;
 import com.marcoshsc.domain.SaleItem;
 import com.marcoshsc.exceptions.InvalidQuantity;
 import com.marcoshsc.exceptions.InvalidSale;
+import com.marcoshsc.exceptions.InvalidStock;
 import com.marcoshsc.exceptions.NullField;
 import com.marcoshsc.services.ClientService;
 import com.marcoshsc.services.ProductService;
@@ -103,16 +104,16 @@ public class SaleController {
 			Sale preSale = Sale.makeSale(requestClient, saleItems);
 			Sale dbSale = saleService.update(id, preSale);
 			return new FinalResponse<Sale>("200", dbSale);
-		} catch (InvalidSale | NullField | InvalidQuantity exc) {
+		} catch (InvalidSale | NullField | InvalidQuantity | InvalidStock exc) {
 			ErrorDAO error = new ErrorDAO(exc.getMessage());
 			return new FinalResponse<ErrorDAO>("400", error);
 		} catch(NoSuchElementException exc) {
 			ErrorDAO error = new ErrorDAO("Invalid ID. Client/Sale not found. Can't update the sale.");
-			return new FinalResponse<ErrorDAO>("400", error);}
-//		} catch(Exception exc) {
-//			ErrorDAO error = new ErrorDAO("Unexpected error.");
-//			return new FinalResponse<ErrorDAO>("400", error);
-//		}
+			return new FinalResponse<ErrorDAO>("400", error);
+		} catch(Exception exc) {
+			ErrorDAO error = new ErrorDAO("Unexpected error.");
+			return new FinalResponse<ErrorDAO>("400", error);
+		}
 	}
 	
 	@JsonView(ProductView.SaleItemView.class)

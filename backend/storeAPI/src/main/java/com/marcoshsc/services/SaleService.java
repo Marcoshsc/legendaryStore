@@ -56,13 +56,28 @@ public class SaleService {
 		return dbSale;
 	}
 	
-	public Sale update(Long id, Sale sale) throws NoSuchElementException, NullField {
+	public Sale update(Long id, Sale sale) throws NoSuchElementException, NullField, InvalidStock {
 		sale.checkIrregularities();
 		Sale dbSale = salesRepo.findById(id).get();
 		dbSale.setClient(sale.getClient());
 		dbSale.setDate(sale.getDate());
 		for(SaleItem si: sale.getSaleItems()) {
 			si.setSale(dbSale);
+			List<SaleItem> dbSaleItems = dbSale.getSaleItems();
+			if(dbSaleItems.contains(si)) {
+				int index = dbSaleItems.indexOf(si);
+				SaleItem dbSaleItem = dbSaleItems.get(index);
+				Long dbQuantity = dbSaleItem.getQuantity();
+				Long siQuantity = si.getQuantity();
+				if(dbQuantity != siQuantity) {
+					Product p = dbSaleItem.getProduct();
+					if(dbQuantity < siQuantity)
+						p.removeStock(siQuantity - dbQuantity);
+					else
+						p.addStock(dbQuantity - siQuantity);
+					dbSaleItem.setQuantity(siQuantity);
+				}
+			}
 		}
 		Set<SaleItem> paramSaleItemsSet = new HashSet<SaleItem>(sale.getSaleItems());
 		Set<SaleItem> dbSaleItemsSet = new HashSet<SaleItem>(dbSale.getSaleItems());
