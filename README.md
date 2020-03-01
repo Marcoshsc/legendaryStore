@@ -37,6 +37,18 @@ Possuir um banco de dados POSTGRESQL rodando no endereço https://localhost:5432
 
 ## Execução
 
+Para execução em linha de comando, siga os seguintes comandos:
+
 	git clone https://github.com/Marcoshsc/legendaryStore.git
-	cd legendaryStore
+	cd legendaryStore/backend/storeAPI
+	mvn install
+	cd target
+	java -jar storeAPI-0.0.1-SNAPSHOT.jar
+
+Caso utilize uma IDE, basta baixar o projeto, abrir o diretório storeAPI na ferramenta, e executar a classe principal: 
+
+	com.marcoshsc.storeAPI.StoreAPIApplication.java
+	
+## Manual de Utilização
+No diretório principal do programa existe um pdf onde segue o manual de utilização da API.
 	
